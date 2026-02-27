@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: yt-ingestion-service
+  server:
+    port: 8080
+  kafka:
+    bootstrap-servers: ${KAFKA_HOST:localhost:9092}
+    topic: ${KAFKA_TOPIC:youtube-events}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    properties:
+      spring.json.add.type.headers: false
+      spring.json.trusted.packages: '*'
+youtube:
+  webhook:
+    secret: ${YOUTUBE_WEBHOOK_SECRET:my_default_secret}
