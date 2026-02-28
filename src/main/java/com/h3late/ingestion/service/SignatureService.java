@@ -13,9 +13,11 @@ import java.util.HexFormat;
 @Service
 public class SignatureService {
 
-    @Value("${youtube.webhook.secret}")
-    private String secret;
+    private final String secret;
 
+    public SignatureService(@Value("${youtube.webhook.secret}") String secret) {
+        this.secret = secret;
+    }
     private static final String HMAC_ALGORITHM = "HmacSHA1";
 
     public boolean isValidSignature(String signatureHeader, String payload) {

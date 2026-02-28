@@ -24,11 +24,13 @@ public class KafkaProducerService {
     }
 
     public void publishVideoEvent(String videoId, YouTubeFeedDto.Entry messageBody) {
-        CompletableFuture<SendResult<String, Object>> future =
-                this.kafkaTemplate.send(this.topic, videoId, messageBody);
-
-
-        future.whenComplete((result, ex) -> {
+        this.kafkaTemplate.send(
+                this.topic,
+                videoId,
+                messageBody
+        ).whenComplete((
+                result,
+                ex) -> {
             if (ex == null) {
                 log.info("Sent message=[{}] with offset=[{}]", messageBody.getTitle(), result.getRecordMetadata().offset());
             } else {
