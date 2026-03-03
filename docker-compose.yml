@@ -1,28 +1,39 @@
 services:
   # Official Kafka Image
+  # kafka cluster
   kafka:
     image: apache/kafka:latest
     ports:
       - "9092:9092"
     environment:
-      KAFKA_NODE_ID: 1
-      KAFKA_PROCESS_ROLES: broker,controller
-      KAFKA_LISTENERS: EXTERNAL://:9092,INTERNAL://:29092,CONTROLLER://:9093
-      KAFKA_ADVERTISED_LISTENERS: EXTERNAL://localhost:9092,INTERNAL://kafka:29092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: EXTERNAL:PLAINTEXT,INTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
-      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
-      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_NODE_ID: ${KAFKA_NODE_ID:1}
+      KAFKA_PROCESS_ROLES: ${KAFKA_PROCESS_ROLES:broker,controller}
+      KAFKA_LISTENERS: ${KAFKA_LISTENERS:EXTERNAL://:9092,INTERNAL://:29092,CONTROLLER://:9093}
+      KAFKA_ADVERTISED_LISTENERS: ${KAFKA_ADVERTISED_LISTENERS:EXTERNAL://localhost:9092,INTERNAL://kafka:29092}
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: ${KAFKA_LISTENER_SECURITY_PROTOCOL_MAP:EXTERNAL:PLAINTEXT,INTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT}
+      KAFKA_INTER_BROKER_LISTENER_NAME: ${KAFKA_INTER_BROKER_LISTENER_NAME:INTERNAL}
+      KAFKA_CONTROLLER_QUORUM_VOTERS: ${KAFKA_CONTROLLER_QUORUM_VOTERS:1@localhost:9093}
+      KAFKA_CONTROLLER_LISTENER_NAMES: ${KAFKA_CONTROLLER_LISTENER_NAMES:CONTROLLER}
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: ${KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR:1}
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: ${KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR:1}
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: ${KAFKA_TRANSACTION_STATE_LOG_MIN_ISR:1}
+    networks:
+      - youtube-net
   # Java App
   yt-ingestion:
     build: .
     ports:
       - "8080:8080"
     environment:
-      - KAFKA_HOST=kafka:29092
-      - KAFKA_TOPIC=youtube-events
+      KAFKA_HOST: ${KAFKA_HOST:kafka:29092}
+      KAFKA_TOPIC: ${KAFKA_TOPIC:youtube-events}
+      YOUTUBE_WEBHOOK_SECRET: ${YOUTUBE_WEBHOOK_SECRET:my_default_secret}
+      YOUTUBE_CHANNEL_ID: ${YOUTUBE_CHANNEL_ID:my_default_channel_id}
     depends_on:
       - kafka
+    networks:
+      - youtube-net
+  # kafka UI
   kafdrop:
     image: obsidiandynamics/kafdrop:latest
     depends_on:
@@ -30,4 +41,10 @@ services:
     ports:
       - "9000:9000"
     environment:
-      KAFKA_BROKERCONNECT: kafka:29092
+      KAFKA_BROKERCONNECT: ${KAFKA_HOST:kafka:29092}
+    networks:
+      - youtube-net
+networks:
+  youtube-net:
+    driver: bridge
+    name: youtube-shared-network

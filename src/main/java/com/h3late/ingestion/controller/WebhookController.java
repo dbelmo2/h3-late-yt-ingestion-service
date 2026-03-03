@@ -45,7 +45,6 @@ public class WebhookController {
     public ResponseEntity<Void> handleYouTubeWebhook(
             @RequestHeader("X-Hub-Signature") String signature,
             @RequestBody String requestBody
-
     ) {
         if (!signatureService.isValidSignature(signature, requestBody)) {
             throw new InvalidSignatureException("Invalid signature");
