@@ -2,6 +2,7 @@ package com.h3late.ingestion;
 
 import com.h3late.ingestion.service.SignatureService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -18,6 +19,7 @@ class SignatureServiceTest {
     }
 
     @Test
+    @DisplayName("Should return true when signature is valid")
     void shouldReturnTrue_WhenSignatureIsValid() {
         String payload = "{\"test\": \"data\"}";
         // You'll need to generate a valid HMAC-SHA1 for this payload + secret
@@ -28,6 +30,7 @@ class SignatureServiceTest {
     }
 
     @Test
+    @DisplayName("Should return false when signature is invalid")
     void shouldReturnFalse_WhenPayloadIsTampered() {
         String payload = "original data"; // used to generate signature below
         String tamperedPayload = "hacker data";

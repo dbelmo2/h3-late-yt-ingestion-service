@@ -33,9 +33,12 @@ public class WebhookController {
             @RequestParam("hub.mode") String mode,
             @RequestParam("hub.challenge") String challenge
     ) {
+        log.info("Received YouTube webhook verification request with mode: {}", mode);
         if ("subscribe".equals(mode)) {
+            log.info("Responding to YouTube webhook verification with challenge: {}", challenge);
             return ResponseEntity.ok(challenge);
         } else {
+            log.error("Invalid mode received in YouTube webhook verification: {}", mode);
             return ResponseEntity.badRequest().body("Invalid mode");
         }
     }
@@ -46,16 +49,27 @@ public class WebhookController {
             @RequestHeader("X-Hub-Signature") String signature,
             @RequestBody String requestBody
     ) {
+        log.debug("Incoming Webhook! Signature: {}", signature); // ADD THIS
         if (!signatureService.isValidSignature(signature, requestBody)) {
             throw new InvalidSignatureException("Invalid signature");
         }
 
         try {
             YouTubeFeedDto feedDto = xmlMapper.readValue(requestBody, YouTubeFeedDto.class);
-            kafkaProducerService.publishVideoEvent(
-                    feedDto.getEntry().getVideoId(),
-                    feedDto.getEntry()
-            );
+            if (feedDto != null && feedDto.getEntry() != null) {
+                log.info("Processing video event: {}", feedDto.getEntry().getVideoId());
+                kafkaProducerService.publishVideoEvent(
+                        feedDto.getEntry().getVideoId(),
+                        feedDto.getEntry()
+                );
+            } else if (feedDto != null && feedDto.getDeletedEntry() != null) {
+                log.info("Processing video deletion event: {}", feedDto.getDeletedEntry().getVideoId());
+                kafkaProducerService.publishVideoDeleteEvent(
+                        feedDto.getDeletedEntry().getVideoId()
+                );
+            } else {
+                log.warn("Received YouTube webhook with no recognizable entry or deletedEntry. Ignoring.");
+            }
         } catch (Exception e) {
             // Log the error so you can see if the XML structure itself is the issue
             log.error("Failed to parse YouTube XML", e);

@@ -15,7 +15,7 @@ public class SignatureService {
 
     private final String secret;
 
-    public SignatureService(@Value("${youtube.webhook.secret}") String secret) {
+    public SignatureService(@Value("${youtube.webhook-secret}") String secret) {
         this.secret = secret;
     }
     private static final String HMAC_ALGORITHM = "HmacSHA1";

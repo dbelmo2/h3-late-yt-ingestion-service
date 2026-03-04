@@ -2,6 +2,7 @@ package com.h3late.ingestion;
 
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.h3late.ingestion.dto.YouTubeFeedDto;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -11,6 +12,7 @@ class YouTubeMappingTest {
     private final XmlMapper xmlMapper = new XmlMapper();
 
     @Test
+    @DisplayName("Should map XML to YouTubeFeedDto correctly")
     void shouldMapXmlToDtoCorrectly() throws Exception {
         String xml = """
             <feed xmlns:yt="http://www.youtube.com/xml/schemas/2015">

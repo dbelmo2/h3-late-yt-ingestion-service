@@ -9,10 +9,29 @@ spring:
     properties:
       spring.json.add.type.headers: false
       spring.json.trusted.packages: '*'
+  output:
+    ansi:
+      enabled: ALWAYS
 youtube:
-  webhook:
-    secret: ${YOUTUBE_WEBHOOK_SECRET}
+  channel-id: ${YOUTUBE_CHANNEL_ID}
+  callback-url: ${YOUTUBE_CALLBACK_URL:http://localhost:8080/webhook}
+  webhook-secret: ${YOUTUBE_WEBHOOK_SECRET}
 kafka:
   topic: ${KAFKA_TOPIC}
 server:
   port: 8080
+logging:
+  level:
+    root: INFO
+    # Silence the massive config dump
+    org.apache.kafka.clients.producer.ProducerConfig: WARN
+    org.apache.kafka.common.config.AbstractConfig: WARN
+    # Silence general metadata and heartbeat noise
+    org.apache.kafka: WARN
+    # Make application logs stand out
+    com.h3late.ingestion: DEBUG
+  pattern:
+    console: "%clr(%d{yyyy-MM-dd HH:mm:ss}){faint} %clr(%5p) %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n%wEx"
+
+
+

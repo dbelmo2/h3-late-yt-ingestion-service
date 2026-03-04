@@ -21,6 +21,22 @@ public class KafkaProducerService {
         this.topic = topic;
     }
 
+    public void publishVideoDeleteEvent(String videoId) {
+        this.kafkaTemplate.send(
+                this.topic,
+                videoId,
+                null
+        ).whenComplete((
+                result,
+                ex) -> {
+            if (ex == null) {
+                log.info("Sent delete event for videoId=[{}] with offset=[{}]", videoId, result.getRecordMetadata().offset());
+            } else {
+                log.error("Unable to send delete event for videoId=[{}] due to : {}", videoId, ex.getMessage());
+            }
+        });
+    }
+
     public void publishVideoEvent(String videoId, YouTubeFeedDto.Entry messageBody) {
         this.kafkaTemplate.send(
                 this.topic,
