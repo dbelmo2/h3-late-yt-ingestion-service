@@ -1,26 +1,25 @@
 # Stage 1: Build the application
-# We use the JDK image because it has Maven-compatible tools
-FROM eclipse-temurin:25-jdk-jammy AS build
+# Using the official Maven image with Java 25 pre-installed
+FROM maven:3.9.9-eclipse-temurin-25 AS build
 WORKDIR /build
 
-# Install Maven manually since there isn't a 25-maven image yet
-RUN apt-get update && apt-get install -y maven
-
-# Copy and build
+# 1. Copy pom.xml and download dependencies (cached layer)
 COPY pom.xml .
 RUN mvn dependency:go-offline
+
+# 2. Copy source and build
 COPY src ./src
 RUN mvn clean package -DskipTests
 
-# Stage 2: Create the final image
+# Stage 2: Create the final production image
 FROM eclipse-temurin:25-jre-jammy
-# Re-adding the security layer
+# Security: Create a non-root user
 RUN useradd -m h3user
 USER h3user
 WORKDIR /app
 
-# Copy the jar from the "build" stage
+# Copy the built JAR from the first stage
 COPY --from=build /build/target/*.jar app.jar
 
-# JVM flags updated for Java 25 memory management
+# JVM Flags for Railway's $5 plan (300MB limit)
 ENTRYPOINT ["java", "-Xmx300M", "-Xms300M", "-jar", "app.jar"]
