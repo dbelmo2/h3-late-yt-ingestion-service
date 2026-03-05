@@ -26,6 +26,8 @@ services:
       - "8080:8080"
     environment:
       KAFKA_HOST: ${KAFKA_HOST:-kafka:29092}
+      KAFKA_API_KEY: ${KAFKA_API_KEY:-my_default_api_key}
+      KAFKA_API_SECRET: ${KAFKA_API_SECRET:-my_default_api_secret}
       KAFKA_TOPIC: ${KAFKA_TOPIC:-youtube-events}
       YOUTUBE_WEBHOOK_SECRET: ${YOUTUBE_WEBHOOK_SECRET:-my_default_secret}
       YOUTUBE_CHANNEL_ID: ${YOUTUBE_CHANNEL_ID:-my_default_channel_id}

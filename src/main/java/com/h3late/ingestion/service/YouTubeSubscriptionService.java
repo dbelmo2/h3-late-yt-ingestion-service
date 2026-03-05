@@ -36,7 +36,6 @@ public class YouTubeSubscriptionService {
         String topicUrl = TOPIC_BASE_URL + channelId;
         log.info("Attempting to subscribe to channel {} with callback {} using topicUrl {}", channelId, callbackUrl, topicUrl);
 
-        // WebSub requires form-urlencoded data
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add("hub.mode", "subscribe");
         formData.add("hub.topic", topicUrl);

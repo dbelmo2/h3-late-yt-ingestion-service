@@ -49,7 +49,7 @@ public class WebhookController {
             @RequestHeader("X-Hub-Signature") String signature,
             @RequestBody String requestBody
     ) {
-        log.debug("Incoming Webhook! Signature: {}", signature); // ADD THIS
+        log.debug("Incoming Webhook! Signature: {}", signature);
         if (!signatureService.isValidSignature(signature, requestBody)) {
             throw new InvalidSignatureException("Invalid signature");
         }
@@ -72,7 +72,7 @@ public class WebhookController {
             }
         } catch (Exception e) {
             // Log the error so you can see if the XML structure itself is the issue
-            log.error("Failed to parse YouTube XML", e);
+            log.error("An error occurred while processing request: {}", requestBody, e);
             return ResponseEntity.internalServerError().build();
         }
 
